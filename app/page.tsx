@@ -1,63 +1,65 @@
-import Image from "next/image";
+import Link from "next/link";
+import { BookOpen, Skull, Flame } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center overflow-hidden bg-[#F4ECD8] dark:bg-[#121212] transition-colors duration-300">
+      {/* Gritty Noise Overlay */}
+      <div className="pointer-events-none absolute inset-0 z-0 bg-[url('/noise.png')] opacity-10 dark:opacity-20 mix-blend-overlay"></div>
+
+      {/* Subtle glowing radial gradient in the background (Aceternity-lite effect) */}
+      <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center">
+        <div className="h-[40rem] w-[40rem] rounded-full bg-[#8B5A2B]/10 dark:bg-[#D4A373]/5 blur-[100px]"></div>
+      </div>
+
+      <main className="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        {/* Warning Badge */}
+        <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#8B5A2B]/30 bg-black/5 dark:bg-white/5 px-4 py-1.5 text-sm font-medium text-[#5C3A21] dark:text-[#D4A373] backdrop-blur-md">
+          <Flame className="h-4 w-4" aria-hidden="true" />
+          <span>The Mother&apos;s Fire is still burning.</span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        {/* Hero Typography */}
+        <h1 className="font-serif text-5xl md:text-7xl font-bold text-[#1A1A1A] dark:text-[#F4ECD8] tracking-tight mb-6">
+          Welcome to the{" "}
+          <span className="text-[#8B5A2B] dark:text-[#D4A373]">Frontline.</span>
+        </h1>
+
+        <p className="max-w-2xl text-lg md:text-xl text-[#3A2214] dark:text-slate-300 mb-2 leading-relaxed">
+          The Midnight Realm is bleeding into our world. This archive contains
+          the lore, the bloodlines, and the weaknesses of the things hunting you
+          in the dark.
+        </p>
+
+        <p className="font-['Caveat',_cursive] text-2xl text-[#5C3A21] dark:text-[#8B5A2B] mb-10 -rotate-2">
+          Read it. Memorize it. Survive. — Amber
+        </p>
+
+        {/* Call to Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+          <Button
+            asChild
+            size="lg"
+            className="bg-[#5C3A21] hover:bg-[#3A2214] text-[#F4ECD8] font-semibold tracking-wide border border-transparent dark:border-[#3A2214] dark:hover:border-[#D4A373] transition-all"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <Link href="/wiki">
+              <BookOpen className="mr-2 h-5 w-5" aria-hidden="true" />
+              Enter the Archives
+            </Link>
+          </Button>
+
+          <Button
+            asChild
+            variant="outline"
+            size="lg"
+            className="border-[#8B5A2B] text-[#5C3A21] hover:bg-[#8B5A2B]/10 dark:text-[#D4A373] dark:border-[#D4A373] dark:hover:bg-[#D4A373]/10 dark:bg-transparent transition-all"
           >
-            Documentation
-          </a>
+            <Link href="/blog">
+              <Skull className="mr-2 h-5 w-5" aria-hidden="true" />
+              Read Field Notes
+            </Link>
+          </Button>
         </div>
       </main>
     </div>
