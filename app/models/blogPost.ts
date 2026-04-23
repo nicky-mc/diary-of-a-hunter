@@ -1,47 +1,36 @@
 // src/models/BlogPost.ts
-import mongoose, { Schema, Document, models } from "mongoose";
+import mongoose, { Schema, model, models } from "mongoose";
 
-export interface IBlogPost extends Document {
+// This is what the data looks like in the DB (The POJO)
+export interface IBlogPost {
+  _id: string;
   title: string;
   slug: string;
-  content: string; // HTML string from TipTap/Quill
+  content: string;
   excerpt: string;
-  authorId: mongoose.Types.ObjectId; // References NextAuth user
-  coverImage: {
-    url: string; // Cloudinary URL
-    altText: string; // CRITICAL for a11y & SEO
-  };
-  tags: string[]; // e.g., 'vampires', 'lore', 'weapons'
+  tags: string[]; // Strict array of strings
+  authorId: mongoose.Types.ObjectId | string;
   isPublished: boolean;
   publishedAt: Date;
+  coverImage: {
+    url: string;
+    altText: string;
+  };
 }
 
-const BlogPostSchema = new Schema<IBlogPost>(
-  {
-    title: { type: String, required: true, trim: true },
-    slug: { type: String, required: true, unique: true, lowercase: true },
-    content: { type: String, required: true },
-    excerpt: { type: String, required: true, maxLength: 300 },
-    authorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    coverImage: {
-      url: { type: String, required: true },
-      altText: {
-        type: String,
-        required: [
-          true,
-          "Alt text is strictly required for accessibility and survival.",
-        ],
-        maxLength: 150,
-      },
-    },
-    tags: [{ type: String, trim: true }],
-    isPublished: { type: Boolean, default: false },
-    publishedAt: { type: Date },
+const BlogPostSchema = new Schema<IBlogPost>({
+  title: { type: String, required: true },
+  slug: { type: String, required: true, unique: true },
+  content: { type: String, required: true },
+  excerpt: { type: String },
+  tags: [{ type: String }], // Ensure Mongoose knows this is a string array
+  authorId: { type: Schema.Types.ObjectId, ref: "User" },
+  isPublished: { type: Boolean, default: false },
+  publishedAt: { type: Date, default: Date.now },
+  coverImage: {
+    url: { type: String },
+    altText: { type: String },
   },
-  { timestamps: true },
-);
+});
 
-// Prevent model recompilation in Next.js development
-const BlogPost =
-  models.BlogPost || mongoose.model<IBlogPost>("BlogPost", BlogPostSchema);
-export default BlogPost;
+export default models.BlogPost || model<IBlogPost>("BlogPost", BlogPostSchema);
