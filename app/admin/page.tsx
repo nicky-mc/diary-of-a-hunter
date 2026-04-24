@@ -53,24 +53,24 @@ export default async function AdminDashboard() {
         {/* Action Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Action Card: New Lore Entry */}
-          <section className="group relative overflow-hidden rounded-xl border border-slate-300 dark:border-slate-800 bg-white/80 dark:bg-[#121212] p-6 shadow-lg transition-all hover:border-[#8B5A2B] dark:hover:border-[#D4A373]">
-            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-0 group-hover:opacity-10 mix-blend-overlay transition-opacity duration-500"></div>
-            <h2 className="font-serif text-2xl font-bold mb-2">
-              Log New Entity
-            </h2>
-            <p className="text-sm mb-6 text-slate-600 dark:text-slate-400">
-              Spotted a new breed? Document its weaknesses before it hunts
-              again.
-            </p>
-            <Link
-              href="/admin/wiki/new"
-              className="inline-block bg-[#5C3A21] text-[#F4ECD8] px-4 py-2 rounded text-sm font-bold uppercase tracking-wider hover:bg-[#8B5A2B] transition-colors focus-visible:ring-2 focus-visible:ring-[#8B5A2B] outline-none"
-              aria-label="Create a new Lore Wiki entry"
-            >
-              Open Bestiary
-            </Link>
+          <section className="relative overflow-hidden rounded-xl border border-slate-300 dark:border-slate-800 bg-white/80 dark:bg-[#121212] p-6 shadow-lg">
+            {/* FIXED: pointer-events-none ensures the noise doesn't block clicks */}
+            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay pointer-events-none"></div>
+            <div className="relative z-10">
+              <h2 className="font-serif text-2xl font-bold mb-2">
+                Log New Entity
+              </h2>
+              <p className="text-sm mb-6 text-slate-600 dark:text-slate-400">
+                Document a new breed and its weaknesses.
+              </p>
+              <Link
+                href="/admin/wiki/new"
+                className="inline-block bg-[#5C3A21] text-[#F4ECD8] px-4 py-2 rounded text-sm font-bold uppercase tracking-wider hover:bg-[#8B5A2B] transition-colors"
+              >
+                Open Bestiary
+              </Link>
+            </div>
           </section>
-
           {/* Action Card: New Field Report (Blog) */}
           <section className="group relative overflow-hidden rounded-xl border border-slate-300 dark:border-slate-800 bg-white/80 dark:bg-[#121212] p-6 shadow-lg transition-all hover:border-[#8B5A2B] dark:hover:border-[#D4A373]">
             <h2 className="font-serif text-2xl font-bold mb-2">

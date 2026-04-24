@@ -1,11 +1,11 @@
-// src/models/User.ts
+// src/models/user.ts
 import mongoose, { Schema, Document, models } from "mongoose";
 
 export interface IUser extends Document {
   email: string;
-  passwordHash: string;
+  password: string; // Changed from passwordHash to password
   name: string;
-  role: string; // e.g., 'hunter', 'admin'
+  role: string;
 }
 
 const UserSchema = new Schema<IUser>(
@@ -17,7 +17,8 @@ const UserSchema = new Schema<IUser>(
       lowercase: true,
       trim: true,
     },
-    passwordHash: {
+    password: {
+      // Changed to password
       type: String,
       required: true,
     },
@@ -33,5 +34,6 @@ const UserSchema = new Schema<IUser>(
   { timestamps: true },
 );
 
-const User = models.User || mongoose.model<IUser>("User", UserSchema);
+// Explicitly naming the collection 'users' is the safest path
+const User = models.User || mongoose.model<IUser>("User", UserSchema, "users");
 export default User;
