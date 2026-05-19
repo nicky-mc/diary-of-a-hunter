@@ -3,7 +3,11 @@ import dbConnect from "@/lib/mongodb";
 import WikiEntry, { IWikiEntry } from "@/app/models/wikiEntry";
 import { notFound } from "next/navigation";
 import { Skull, ShieldAlert, Zap } from "lucide-react";
-import { CldImage } from "next-cloudinary";
+// Use next/image here instead of CldImage — next-cloudinary's CldImage uses
+// useState internally and its client boundary doesn't propagate cleanly when
+// imported into a server component under Next 16 + React 19. Cloudinary URLs
+// work fine with next/image since res.cloudinary.com is in next.config.ts.
+import Image from "next/image";
 import { redirectLegacyIdToSlug } from "@/lib/legacySlugRedirect";
 
 type PageProps = {
@@ -59,7 +63,7 @@ export default async function WikiEntryPage(props: PageProps) {
             {entry.coverImage?.url && (
               <figure className="not-prose border-2 border-hunter-warm bg-black/5 dark:bg-black/30 overflow-hidden shadow-lg w-full max-w-[280px] mx-auto md:mx-0">
                 <div className="relative aspect-[4/3] w-full">
-                  <CldImage
+                  <Image
                     src={entry.coverImage.url}
                     alt={entry.coverImage.altText || entry.title}
                     fill

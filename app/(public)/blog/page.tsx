@@ -2,7 +2,9 @@
 import dbConnect from "@/lib/mongodb";
 import BlogPost, { IBlogPost } from "@/app/models/blogPost";
 import Link from "next/link";
-import { CldImage } from "next-cloudinary";
+// next/image rather than CldImage — see app/(public)/wiki/[slug]/page.tsx
+// for the explanation. CldImage breaks server-component boundaries here.
+import Image from "next/image";
 
 // Define a strict interface for the post data we get back from Lean
 interface BlogPostSummary {
@@ -56,7 +58,7 @@ export default async function BlogLibrary() {
           >
             <div className="aspect-video relative overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-500">
               {post.coverImage?.url ? (
-                <CldImage
+                <Image
                   src={post.coverImage.url}
                   alt={post.coverImage.altText || post.title}
                   fill
