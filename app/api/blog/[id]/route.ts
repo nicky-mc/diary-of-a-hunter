@@ -12,10 +12,12 @@ interface UpdateBlogBody {
   content?: string;
   tags?: string | string[];
   excerpt?: string;
+  // Pass `null` to explicitly remove an existing cover image;
+  // omit to leave it untouched.
   coverImage?: {
     url: string;
     altText: string;
-  };
+  } | null;
   isPublished?: boolean;
 }
 

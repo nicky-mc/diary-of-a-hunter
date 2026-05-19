@@ -146,3 +146,106 @@
     @apply font-sans;
   }
 }
+
+/* =============================================================================
+   Rich text editor + rendered content styles
+   ============================================================================
+   These rules style both:
+     - The Tiptap editor while writing (`.doah-editor`)
+     - The rendered HTML on the public detail pages (Tailwind `.prose` containers)
+   So what the writer sees and what the reader sees stay consistent.
+   ============================================================================= */
+
+/* Figure / figcaption — used by the custom Figure node */
+.prose figure[data-figure],
+.doah-editor figure[data-figure] {
+  margin: 1.5rem 0;
+}
+
+.prose figcaption.doah-figcaption,
+.doah-editor figcaption.doah-figcaption {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-style: italic;
+  font-size: 0.875rem;
+  color: oklch(0.556 0 0);
+}
+
+/* YouTube iframes inserted by Tiptap */
+.prose .doah-youtube,
+.doah-editor .doah-youtube,
+.prose iframe[src*="youtube.com"],
+.doah-editor iframe[src*="youtube.com"] {
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 0;
+  border-radius: 0.5rem;
+  margin: 1.5rem auto;
+  display: block;
+}
+
+/* Tables — Tiptap adds .doah-table to the <table> element */
+.prose .doah-table,
+.doah-editor .doah-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+.prose .doah-table th,
+.prose .doah-table td,
+.doah-editor .doah-table th,
+.doah-editor .doah-table td {
+  border: 1px solid var(--color-hunter-warm, #8b5a2b);
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+}
+
+.prose .doah-table th,
+.doah-editor .doah-table th {
+  background-color: color-mix(in oklch, var(--color-hunter-warm) 12%, transparent);
+  font-weight: 700;
+  text-align: left;
+}
+
+/* Currently-selected table cell highlight (Tiptap default class) */
+.doah-editor .selectedCell {
+  background-color: color-mix(in oklch, var(--color-hunter-warm) 20%, transparent);
+}
+
+/* Placeholder text — shown when the editor (or any empty paragraph) is empty */
+.doah-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: oklch(0.556 0 0);
+  pointer-events: none;
+  height: 0;
+  font-style: italic;
+}
+
+/* Tiptap applies inline `style="font-size: …"` via the FontSize extension —
+   ensure the prose container respects it (Tailwind's prose normally constrains
+   font-size on common tags, which can override our inline styles otherwise). */
+.prose [style*="font-size"],
+.doah-editor [style*="font-size"] {
+  line-height: inherit;
+}
+
+/* Highlight mark — looks reasonable in both themes */
+.prose mark,
+.doah-editor mark {
+  padding: 0 0.15em;
+  border-radius: 0.15em;
+}
+
+/* Code block visual treatment */
+.prose pre,
+.doah-editor pre {
+  background-color: oklch(0.205 0 0);
+  color: oklch(0.985 0 0);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
