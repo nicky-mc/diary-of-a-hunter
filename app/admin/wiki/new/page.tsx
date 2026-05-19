@@ -60,8 +60,12 @@ export default function NewWikiEntry() {
 
       router.push("/wiki");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
       setLoading(false);
     }
   };
