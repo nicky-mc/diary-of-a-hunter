@@ -14,6 +14,7 @@ import { Search, ShieldAlert, FileImage, BookOpen, ScrollText } from "lucide-rea
 import dbConnect from "@/lib/mongodb";
 import BlogPost from "@/app/models/blogPost";
 import WikiEntry from "@/app/models/wikiEntry";
+import { ensureSearchIndexes } from "@/lib/ensureSearchIndexes";
 
 export const metadata = {
   title: "Search | Diary of a Hunter",
@@ -104,6 +105,9 @@ export default async function SearchPage(props: SearchPageProps) {
 
   if (hasQuery) {
     await dbConnect();
+    // First call hits Mongo to create the text indexes; subsequent calls
+    // are a cached no-op for the lifetime of the Node process.
+    await ensureSearchIndexes();
 
     const blogPromise =
       type !== "wiki"
