@@ -1,14 +1,32 @@
 // src/components/ui/RichTextEditor.tsx
+//
+// Tiptap-backed rich text editor.
+//
+// Public API stays identical to the previous Quill version — every form
+// that imports this component continues to work without changes:
+//
+//   <RichTextEditor
+//     value={html}
+//     onChange={setHtml}
+//     placeholder="…"
+//   />
+//
+// Composition:
+//   Toolbar         — the persistent top toolbar (lots of buttons)
+//   ImageInspector  — floating menu shown when a figure is selected
+//   Editor          — the actual contenteditable
+
 "use client";
 
-import { useEffect, useRef } from "react";
-import Quill from "quill";
-// Import the official v2 styles
-import "quill/dist/quill.snow.css";
+import { useEditor, EditorContent } from "@tiptap/react";
+import { useEffect } from "react";
+import Toolbar from "./rich-text/Toolbar";
+import ImageInspector from "./rich-text/ImageInspector";
+import { buildExtensions } from "./rich-text/extensions";
 
 interface RichTextEditorProps {
   value: string;
-  onChange: (content: string) => void;
+  onChange: (html: string) => void;
   placeholder?: string;
 }
 
@@ -17,65 +35,52 @@ export default function RichTextEditor({
   onChange,
   placeholder,
 }: RichTextEditorProps) {
-  const editorRef = useRef<HTMLDivElement>(null);
-  const quillInstance = useRef<Quill | null>(null);
-  const isInitializing = useRef(true);
+  const editor = useEditor({
+    // Important under Next.js App Router — Tiptap renders client-only,
+    // and `immediatelyRender: false` avoids hydration warnings.
+    immediatelyRender: false,
+    extensions: buildExtensions(placeholder ?? "Start writing…"),
+    content: value || "",
+    editorProps: {
+      attributes: {
+        // These classes drive the prose styling INSIDE the editor.
+        // The same classes are reused on the public detail pages, so what
+        // you see while writing matches what readers will see.
+        class:
+          "doah-editor prose prose-slate dark:prose-invert max-w-none min-h-[400px] px-4 py-4 focus:outline-none prose-headings:font-serif prose-headings:text-hunter-dark dark:prose-headings:text-hunter-parchment prose-a:text-hunter-warm dark:prose-a:text-hunter-gold",
+      },
+    },
+    onUpdate({ editor }) {
+      // Emit HTML back to the parent on every change
+      onChange(editor.getHTML());
+    },
+  });
 
+  // Keep editor content in sync if the parent resets it externally
+  // (e.g. after a successful save that clears the form).
   useEffect(() => {
-    if (editorRef.current && !quillInstance.current) {
-      // The Full Suite: Every tool Quill offers natively.
-      const fullToolbarOptions = [
-        [{ font: [] }, { size: ["small", false, "large", "huge"] }], // Font family and size
-        [{ header: [1, 2, 3, 4, 5, 6, false] }], // Full heading control
-
-        ["bold", "italic", "underline", "strike"], // Core formatting
-        [{ color: [] }, { background: [] }], // Text color and highlighter
-        [{ script: "sub" }, { script: "super" }], // Superscript/Subscript (good for chemistry/spells)
-
-        [{ align: [] }], // Text alignment
-        [{ list: "ordered" }, { list: "bullet" }], // Lists
-        [{ indent: "-1" }, { indent: "+1" }], // Indentation control
-
-        ["blockquote", "code-block"], // Blocks
-        ["link", "image", "video"], // Media embeds (URL-based by default)
-
-        ["clean"], // Clear all formatting
-      ];
-
-      quillInstance.current = new Quill(editorRef.current, {
-        theme: "snow",
-        placeholder: placeholder || "Document the encounter in full detail...",
-        modules: {
-          toolbar: fullToolbarOptions,
-        },
-      });
-
-      // Listen for text changes and pass the raw HTML back to your form
-      quillInstance.current.on("text-change", () => {
-        const html = quillInstance.current?.root.innerHTML || "";
-        onChange(html);
-      });
+    if (!editor) return;
+    const current = editor.getHTML();
+    if (value !== current) {
+      editor.commands.setContent(value || "", { emitUpdate: false });
     }
-  }, [onChange, placeholder]);
-
-  // Handle updates if the value changes externally (like clearing the form after saving)
-  useEffect(() => {
-    if (
-      quillInstance.current &&
-      value !== quillInstance.current.root.innerHTML
-    ) {
-      if (isInitializing.current) {
-        quillInstance.current.clipboard.dangerouslyPasteHTML(value);
-        isInitializing.current = false;
-      }
-    }
+    // We intentionally don't include `editor` here — calling setContent on
+    // every editor reference change would loop with the onUpdate handler.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
+  if (!editor) {
+    // Skeleton placeholder while the editor instance is constructed
+    return (
+      <div className="rounded-md border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-hunter-shadow min-h-[460px] animate-pulse" />
+    );
+  }
+
   return (
-    // We keep the container light because Quill's advanced dropdowns (colors, fonts, sizes)
-    // are strictly designed for a light theme by default.
-    <div className="quill-wrapper rounded bg-slate-50 border border-slate-300 dark:border-slate-600 transition-colors">
-      <div ref={editorRef} className="min-h-[400px] text-slate-900" />
+    <div className="rounded-md border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-hunter-shadow overflow-hidden">
+      <Toolbar editor={editor} />
+      <ImageInspector editor={editor} />
+      <EditorContent editor={editor} />
     </div>
   );
 }

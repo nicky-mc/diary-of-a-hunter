@@ -13,10 +13,12 @@ interface UpdateWikiBody {
   threatLevel?: string;
   weaknesses?: string | string[];
   content?: string;
+  // Pass `null` to explicitly remove an existing cover image;
+  // omit to leave it untouched.
   coverImage?: {
     url: string;
     altText: string;
-  };
+  } | null;
 }
 
 // Next.js dynamic route params are now Promises in recent versions
