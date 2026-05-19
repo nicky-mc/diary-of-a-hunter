@@ -53,15 +53,17 @@ export default async function WikiEntryPage(props: PageProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Tactical Sidebar */}
           <aside className="md:col-span-1 space-y-6">
-            {/* Entity photo — only rendered when an image has been uploaded */}
+            {/* Entity photo — only rendered when an image has been uploaded.
+                Capped at 280px wide and a 4:3 aspect so it never dominates
+                the page on mobile (where the sidebar goes full-width). */}
             {entry.coverImage?.url && (
-              <figure className="border-2 border-hunter-warm bg-black/5 dark:bg-black/30 overflow-hidden shadow-lg">
-                <div className="relative aspect-square w-full">
+              <figure className="not-prose border-2 border-hunter-warm bg-black/5 dark:bg-black/30 overflow-hidden shadow-lg w-full max-w-[280px] mx-auto md:mx-0">
+                <div className="relative aspect-[4/3] w-full">
                   <CldImage
                     src={entry.coverImage.url}
                     alt={entry.coverImage.altText || entry.title}
                     fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
+                    sizes="280px"
                     className="object-cover grayscale-[30%]"
                   />
                 </div>
