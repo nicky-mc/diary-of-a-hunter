@@ -27,7 +27,9 @@ import {
   Minus,
   Link as LinkIcon,
   Image as ImageIcon,
-  Youtube,
+  // lucide-react v1.x dropped the `Youtube` brand icon — `Video` is the
+  // standard generic substitute and renders nicely in the toolbar.
+  Video,
   Table as TableIcon,
   Undo2,
   Redo2,
@@ -486,7 +488,7 @@ export default function Toolbar({ editor }: ToolbarProps) {
       )}
 
       <Btn onClick={addYoutube} title="Embed YouTube video">
-        <Youtube className="h-4 w-4" />
+        <Video className="h-4 w-4" />
       </Btn>
 
       <Btn onClick={insertTable} title="Insert 3×3 table">
