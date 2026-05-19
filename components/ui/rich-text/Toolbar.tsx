@@ -158,12 +158,10 @@ export default function Toolbar({ editor }: ToolbarProps) {
         .run();
   };
 
+  // Sticky at top-16 so the toolbar sits BELOW the h-16 TopNav as the user
+  // scrolls through long content. z-20 keeps it above editor body text but
+  // below the nav (z-50) and dropdown menus.
   return (
-    {/*
-       Sticky at top-16 so the toolbar sits BELOW the h-16 TopNav as the
-       user scrolls through long content. z-20 keeps it above editor body
-       text but below the nav (z-50) and dropdown menus.
-    */}
     <div className="flex flex-wrap items-center gap-1 rounded-t-md border border-b-0 border-slate-300 dark:border-slate-700 bg-hunter-parchment/95 dark:bg-hunter-shadow/95 backdrop-blur-sm px-2 py-1.5 sticky top-16 z-20">
       {/* ============================================================
           Undo / Redo
