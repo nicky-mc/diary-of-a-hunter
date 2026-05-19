@@ -76,11 +76,20 @@ export default function RichTextEditor({
     );
   }
 
+  // No `overflow-hidden` on the wrapper — it would create a scroll context
+  // that traps the sticky toolbar inside the editor. Without it, the toolbar
+  // sticks to the viewport instead, so it stays visible while the user
+  // scrolls through a long document (or past a cover image above).
+  // Border + radius live on the toolbar (top) and the content area (bottom)
+  // instead of the outer wrapper, so visual edges still line up.
   return (
-    <div className="rounded-md border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-hunter-shadow overflow-hidden">
+    <div className="rounded-md bg-white/80 dark:bg-hunter-shadow">
       <Toolbar editor={editor} />
       <ImageInspector editor={editor} />
-      <EditorContent editor={editor} />
+      <EditorContent
+        editor={editor}
+        className="border border-t-0 border-slate-300 dark:border-slate-700 rounded-b-md"
+      />
     </div>
   );
 }
