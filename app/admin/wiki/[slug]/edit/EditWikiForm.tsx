@@ -13,6 +13,7 @@ import RichTextEditor from "@/components/ui/RichTextEditor";
 import CoverImageUploader, {
   type CoverImageValue,
 } from "@/components/ui/CoverImageUploader";
+import StatsEditor, { type StatRow } from "@/components/ui/StatsEditor";
 
 export interface WikiInitialData {
   id: string;
@@ -20,6 +21,7 @@ export interface WikiInitialData {
   category: string;
   threatLevel: string;
   weaknesses: string[];
+  stats: StatRow[];
   content: string;
   coverImage: CoverImageValue | null;
 }
@@ -34,6 +36,7 @@ export default function EditWikiForm({
   const [category, setCategory] = useState(initial.category);
   const [threatLevel, setThreatLevel] = useState(initial.threatLevel);
   const [weaknesses, setWeaknesses] = useState<string[]>(initial.weaknesses);
+  const [stats, setStats] = useState<StatRow[]>(initial.stats);
   const [content, setContent] = useState(initial.content);
   const [coverImage, setCoverImage] = useState<CoverImageValue | null>(
     initial.coverImage,
@@ -59,6 +62,7 @@ export default function EditWikiForm({
           category,
           threatLevel,
           weaknesses: weaknesses.filter((w) => w.trim() !== ""),
+          stats: stats.filter((s) => s.label.trim() && s.value.trim()),
           content,
           // Always send the field — null explicitly clears an existing image,
           // an object replaces it. (undefined would leave it untouched.)
@@ -196,6 +200,10 @@ export default function EditWikiForm({
               onChange={setCoverImage}
               label="Entity Photo"
             />
+          </div>
+
+          <div className="bg-white/50 dark:bg-hunter-shadow p-6 rounded border border-slate-300 dark:border-slate-800">
+            <StatsEditor value={stats} onChange={setStats} />
           </div>
 
           <div className="space-y-2">

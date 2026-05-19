@@ -36,6 +36,7 @@ export default async function EditWikiEntryPage(props: PageProps) {
         category: entry.category,
         threatLevel: entry.threatLevel,
         weaknesses: entry.weaknesses?.length ? [...entry.weaknesses] : [""],
+        stats: entry.stats ?? [],
         content: entry.content,
         coverImage: entry.coverImage ?? null,
       }}

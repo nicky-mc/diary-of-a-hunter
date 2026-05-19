@@ -1,13 +1,31 @@
 // src/models/WikiEntry.ts
 import mongoose, { Schema, Document, models } from "mongoose";
 
+/**
+ * A single row in the wiki-style infobox under the cover image.
+ *
+ * Examples:
+ *   { label: "Origin",  value: "Eastern Europe" }
+ *   { label: "Diet",    value: "Blood" }
+ *   { label: "Range",   value: "Effective at 200m" }   (for weapons)
+ *   { label: "Founded", value: "13th century" }        (for bloodlines)
+ *
+ * Schema is intentionally loose — different categories have different
+ * useful stats, and a fixed shape would force them all into one mould.
+ */
+export interface IWikiStat {
+  label: string;
+  value: string;
+}
+
 export interface IWikiEntry extends Document {
   title: string;
   slug: string;
   category: "bestiary" | "weapons" | "bloodlines" | "conspiracy";
   threatLevel: "Low" | "Moderate" | "Severe" | "Apocalyptic" | "Unknown";
   weaknesses: string[]; // e.g., ['Silver', 'Fire', 'Decapitation']
-  content: string; // HTML string from Quill
+  stats?: IWikiStat[]; // Wiki-style infobox rows
+  content: string; // HTML string from the rich text editor
   authorId: mongoose.Types.ObjectId;
   coverImage?: {
     url: string;
@@ -30,6 +48,14 @@ const WikiEntrySchema = new Schema<IWikiEntry>(
       enum: ["Low", "Moderate", "Severe", "Apocalyptic", "Unknown"],
     },
     weaknesses: [{ type: String, trim: true }],
+    // Stats rows — `_id: false` keeps the subdocuments lean
+    stats: [
+      {
+        _id: false,
+        label: { type: String, required: true, trim: true, maxLength: 60 },
+        value: { type: String, required: true, trim: true, maxLength: 200 },
+      },
+    ],
     content: { type: String, required: true },
     authorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     coverImage: {
