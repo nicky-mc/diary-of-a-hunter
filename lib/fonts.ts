@@ -22,8 +22,12 @@
 // FONT_OPTIONS — no other code changes required.
 // =============================================================================
 
-import { Inter, Caveat, Playfair_Display, JetBrains_Mono } from "next/font/google";
-import localFont from "next/font/local";
+import {
+  Inter,
+  Caveat,
+  Playfair_Display,
+  JetBrains_Mono,
+} from "next/font/google";
 
 // -----------------------------------------------------------------------------
 // Loader declarations.
@@ -32,6 +36,24 @@ import localFont from "next/font/local";
 // analysable module — that's why we can't make this dynamic. The variable
 // name on the left of the `=` is also used as the CSS variable name on the
 // right, by convention.
+//
+// To add a LOCAL font: uncomment the localFont import below + the example
+// loader call, drop the actual .woff2 files into public/fonts/, then add an
+// entry to FONT_OPTIONS at the bottom of this file.
+//
+//   import localFont from "next/font/local";
+//
+//   const eldritch = localFont({
+//     src: [
+//       { path: "../public/fonts/Eldritch-Regular.woff2", weight: "400", style: "normal" },
+//       { path: "../public/fonts/Eldritch-Bold.woff2",    weight: "700", style: "normal" },
+//     ],
+//     variable: "--font-eldritch",
+//     display: "swap",
+//   });
+//
+// Next.js's font-loader lint plugin REQUIRES every imported loader to be
+// called and assigned. Don't import `localFont` until you're ready to use it.
 // -----------------------------------------------------------------------------
 
 const inter = Inter({
@@ -57,23 +79,6 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono-jetbrains",
   display: "swap",
 });
-
-/**
- * EXAMPLE of a local font — uncomment after dropping a .woff2 into public/fonts/
- * and remove this comment block. Then add it to FONT_OPTIONS below.
- *
- * const eldritch = localFont({
- *   src: [
- *     { path: "../public/fonts/Eldritch-Regular.woff2", weight: "400", style: "normal" },
- *     { path: "../public/fonts/Eldritch-Bold.woff2", weight: "700", style: "normal" },
- *   ],
- *   variable: "--font-eldritch",
- *   display: "swap",
- * });
- */
-
-// Silence unused-import warning until the user adds a local font
-void localFont;
 
 // -----------------------------------------------------------------------------
 // PUBLIC API
