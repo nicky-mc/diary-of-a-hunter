@@ -4,7 +4,16 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useSession } from "next-auth/react";
-import { Menu, X, Moon, Sun, BookOpen, ShieldAlert, LogIn } from "lucide-react";
+import {
+  Menu,
+  X,
+  Moon,
+  Sun,
+  BookOpen,
+  ShieldAlert,
+  LogIn,
+  Search,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const NAV_LINKS = [
@@ -53,6 +62,29 @@ export default function TopNav() {
                 {link.name}
               </Link>
             ))}
+
+            <div className="h-4 w-px bg-hunter-parchment/20 mx-2" />
+
+            {/* Desktop search — a plain GET form, no client state required.
+                Hitting Enter (or clicking the icon) navigates to /search?q=… */}
+            <form
+              action="/search"
+              method="get"
+              role="search"
+              className="relative"
+            >
+              <label htmlFor="topnav-search" className="sr-only">
+                Search the archive
+              </label>
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-hunter-parchment/60 pointer-events-none" />
+              <input
+                id="topnav-search"
+                type="search"
+                name="q"
+                placeholder="Search the archive…"
+                className="w-44 xl:w-56 rounded-full bg-black/20 placeholder:text-hunter-parchment/50 text-hunter-parchment text-xs pl-7 pr-3 py-1.5 border border-hunter-parchment/20 focus:border-hunter-gold focus:bg-black/30 focus:w-64 transition-all outline-none"
+              />
+            </form>
 
             <div className="h-4 w-px bg-hunter-parchment/20 mx-2" />
 
@@ -127,8 +159,29 @@ export default function TopNav() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="lg:hidden fixed inset-0 top-16 z-40 bg-hunter-mid dark:bg-[#111] px-6 py-12 flex flex-col gap-8"
+            className="lg:hidden fixed inset-0 top-16 z-40 bg-hunter-mid dark:bg-[#111] px-6 py-12 flex flex-col gap-8 overflow-y-auto"
           >
+            {/* Mobile search — same GET form, larger target for thumbs */}
+            <form
+              action="/search"
+              method="get"
+              role="search"
+              onSubmit={() => setIsOpen(false)}
+              className="relative"
+            >
+              <label htmlFor="topnav-search-mobile" className="sr-only">
+                Search the archive
+              </label>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-hunter-parchment/60 pointer-events-none" />
+              <input
+                id="topnav-search-mobile"
+                type="search"
+                name="q"
+                placeholder="Search the archive…"
+                className="w-full rounded bg-black/30 placeholder:text-hunter-parchment/50 text-hunter-parchment pl-10 pr-3 py-3 border border-hunter-parchment/20 focus:border-hunter-gold outline-none"
+              />
+            </form>
+
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.name}
