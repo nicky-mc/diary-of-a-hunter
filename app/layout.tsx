@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import TopNav from "@/components/layout/TopNav";
 import Footer from "@/components/layout/Footer";
+import CustomFontStyles from "@/components/CustomFontStyles";
 import { FONT_VARIABLES } from "@/lib/fonts";
 import "./globals.css";
 
@@ -19,6 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      {/* @font-face rules for any fonts uploaded via /admin/fonts.
+          Renders in <head> automatically because the result is a <style>
+          tag returned from a server component at the root. */}
+      <CustomFontStyles />
       <body
         // FONT_VARIABLES contains every --font-* CSS variable defined in
         // lib/fonts.ts. Spreading it here makes them available throughout
