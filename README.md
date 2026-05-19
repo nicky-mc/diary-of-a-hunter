@@ -47,6 +47,77 @@ NEXTAUTH_URL="http://localhost:3000"
 npm run dev
 ```
 Open http://localhost:3000 in your browser. If you see the leather and the cream text, the wards are holding.
+Pushed (`abbb624`).
+
+## Custom Font uploader
+
+1. Click **Admin** in the nav → log in
+2. Click the new **Fonts** card on the dashboard
+3. Fill in:
+   - **Display Name**: how it appears in the dropdown (e.g. "Eldritch Display")
+   - **Weight**: dropdown of all standard weights + a Variable option
+   - **Style**: Normal or Italic
+   - **Font File**: click to browse, pick a `.woff2` file
+4. Click **Install Font** — done
+
+The font is immediately available in the rich-text editor's font-family dropdown under an "Uploaded fonts" group. No restart, no rebuild, no env variables to touch.
+
+## What happens under the hood
+
+```
+User picks file → FontUploadForm POSTs multipart to /api/fonts
+                                          ↓
+                  Server validates + slugifies the name
+                                          ↓
+                  cloudinary.uploader.upload_stream (resource_type: "raw")
+                                          ↓
+                  Save { name, family, fileUrl, weight, style } to MongoDB
+                                          ↓
+                  Return 201 → form refreshes the page (router.refresh)
+                                          ↓
+On every subsequent request:
+  CustomFontStyles (root layout) → fetch all fonts → emit @font-face
+  Toolbar useEffect → fetch /api/fonts → merge into dropdown
+```
+
+## What the admin UI looks like
+
+The fonts list shows each font with a live preview rendered using that font:
+
+```
+┌─────────────────────────────────────────────────────┐
+│ Eldritch Display                                    │
+│ family: eldritch-display · weight: 400 · normal · 38KB │
+│                                                     │
+│ The quick brown fox jumps over the lazy dog         │   ← rendered with the actual font
+│                                            [Remove] │
+└─────────────────────────────────────────────────────┘
+```
+
+## Supported file types
+
+| Format | Extension | Recommendation |
+|---|---|---|
+| **WOFF2** | `.woff2` | ✅ Strongly preferred — best compression, all modern browsers |
+| WOFF | `.woff` | Older fallback, supported but ~30% larger |
+| TrueType | `.ttf` | Works, but no compression — large files |
+| OpenType | `.otf` | Works, but no compression — large files |
+
+Recommend `.woff2` to the user — most font sites (Google Fonts, FontShare, etc.) offer it directly.
+
+## Where the fonts get stored
+
+- **File**: Cloudinary as raw asset at `doah/fonts/<slug>.woff2`
+- **Metadata**: MongoDB `fonts` collection
+- **CSS**: Generated fresh on every page render — no caching surprises
+
+## Limitations to flag
+
+1. **One file per family right now** — uploading the bold and regular as separate entries works but each gets its own family slug (`eldritch-display-regular`, `eldritch-display-bold`). To have one family with multiple weights, we'd need to extend the schema to support multiple file URLs per Font. Tell me if you want that.
+2. **No font preview before upload** — the preview only renders after the font is installed. Adding a "drag to preview" step is doable but adds complexity.
+3. **Public read** — `/api/fonts` is public so the editor on the admin side and the public detail pages can both fetch the list. The actual font files on Cloudinary are also public (necessary — your readers' browsers need to download them). If you ever need locked-down fonts, that's a different setup.
+
+Pull `abbb624`, restart dev, and have a go. Drop a `.woff2` in at `/admin/fonts` and watch it appear in the editor instantly.
 
 ⚠️ Contribution Guidelines
 If you have encountered a new entity, survived an attack, or uncovered a piece of the conspiracy surrounding the Mother's Fire, submit a Pull Request.
