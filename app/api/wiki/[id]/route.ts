@@ -12,6 +12,7 @@ interface UpdateWikiBody {
   category?: string;
   threatLevel?: string;
   weaknesses?: string | string[];
+  stats?: Array<{ label: string; value: string }>;
   content?: string;
   // Pass `null` to explicitly remove an existing cover image;
   // omit to leave it untouched.
@@ -85,11 +86,17 @@ export async function PUT(req: Request, props: RouteContext) {
           : body.weaknesses;
     }
 
+    // Strip blank rows from the stats array if it was sent
+    const cleanedStats = Array.isArray(body.stats)
+      ? body.stats.filter((s) => s?.label?.trim() && s?.value?.trim())
+      : undefined;
+
     const updatedEntry = await WikiEntry.findByIdAndUpdate(
       id,
       {
         ...body,
         ...(body.weaknesses && { weaknesses: parsedWeaknesses }),
+        ...(cleanedStats !== undefined && { stats: cleanedStats }),
         ...(body.title && {
           slug: body.title
             .toLowerCase()

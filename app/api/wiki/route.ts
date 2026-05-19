@@ -12,6 +12,7 @@ interface CreateWikiBody {
   category: "bestiary" | "weapons" | "bloodlines" | "conspiracy";
   threatLevel?: string;
   weaknesses?: string | string[];
+  stats?: Array<{ label: string; value: string }>;
   content: string;
   coverImage?: {
     url: string;
@@ -35,8 +36,15 @@ export async function POST(req: Request) {
     }
 
     const body = (await req.json()) as CreateWikiBody;
-    const { title, category, threatLevel, weaknesses, content, coverImage } =
-      body;
+    const {
+      title,
+      category,
+      threatLevel,
+      weaknesses,
+      stats,
+      content,
+      coverImage,
+    } = body;
 
     if (!title || !category || !content) {
       return NextResponse.json(
@@ -62,12 +70,18 @@ export async function POST(req: Request) {
             .filter(Boolean)
         : [];
 
+    // Filter out empty stat rows that come from the form's blank state
+    const cleanedStats = Array.isArray(stats)
+      ? stats.filter((s) => s?.label?.trim() && s?.value?.trim())
+      : [];
+
     const newEntry = await WikiEntry.create({
       title,
       slug,
       category,
       threatLevel: threatLevel || "Unknown",
       weaknesses: parsedWeaknesses,
+      stats: cleanedStats,
       content,
       coverImage,
       authorId: session.user.id,

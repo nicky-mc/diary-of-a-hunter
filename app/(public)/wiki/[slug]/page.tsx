@@ -2,7 +2,7 @@
 import dbConnect from "@/lib/mongodb";
 import WikiEntry, { IWikiEntry } from "@/app/models/wikiEntry";
 import { notFound } from "next/navigation";
-import { Skull, ShieldAlert, Zap } from "lucide-react";
+import { Skull, ShieldAlert, Zap, BookText } from "lucide-react";
 // Use next/image here instead of CldImage — next-cloudinary's CldImage uses
 // useState internally and its client boundary doesn't propagate cleanly when
 // imported into a server component under Next 16 + React 19. Cloudinary URLs
@@ -77,7 +77,35 @@ export default async function WikiEntryPage(props: PageProps) {
               </figure>
             )}
 
-            <div className="bg-hunter-bone dark:bg-hunter-night p-6 border-2 border-hunter-warm shadow-inner">
+            {/* Wiki-style infobox — renders only when at least one stat row exists.
+                The structure is intentionally simple: a list of rows with a label
+                column and a value column, mimicking the dossier sheets you'd find
+                on a hunter's clipboard. */}
+            {entry.stats && entry.stats.length > 0 && (
+              <div className="not-prose w-full max-w-[280px] mx-auto md:mx-0 border-2 border-hunter-warm bg-white/60 dark:bg-hunter-night/60 shadow-inner">
+                <div className="flex items-center gap-2 px-3 py-2 bg-hunter-warm text-hunter-parchment text-xs font-bold uppercase tracking-widest">
+                  <BookText className="h-4 w-4" />
+                  <span>Dossier</span>
+                </div>
+                <dl className="divide-y divide-hunter-warm/20 text-xs font-mono">
+                  {entry.stats.map((stat, i) => (
+                    <div
+                      key={`${stat.label}-${i}`}
+                      className="grid grid-cols-[1fr_1.4fr] gap-2 px-3 py-2"
+                    >
+                      <dt className="font-bold uppercase tracking-wider text-hunter-mid dark:text-hunter-gold">
+                        {stat.label}
+                      </dt>
+                      <dd className="text-slate-700 dark:text-slate-300 break-words">
+                        {stat.value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
+
+            <div className="not-prose bg-hunter-bone dark:bg-hunter-night p-6 border-2 border-hunter-warm shadow-inner w-full max-w-[280px] mx-auto md:mx-0">
               <h3 className="flex items-center gap-2 font-bold uppercase text-sm mb-4 text-hunter-mid dark:text-hunter-gold">
                 <Skull className="h-4 w-4" />
                 Critical Weaknesses

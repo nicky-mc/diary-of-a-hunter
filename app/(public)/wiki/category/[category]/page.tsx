@@ -1,7 +1,8 @@
 // src/app/(public)/wiki/category/[category]/page.tsx
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ShieldAlert } from "lucide-react";
+import { ArrowLeft, ShieldAlert, FileImage } from "lucide-react";
 import dbConnect from "@/lib/mongodb";
 import WikiEntry from "@/app/models/wikiEntry";
 
@@ -51,6 +52,11 @@ interface CategoryEntry {
   title: string;
   slug: string;
   threatLevel: string;
+  // Optional — entries created before image upload was wired up won't have one
+  coverImage?: {
+    url: string;
+    altText: string;
+  };
 }
 
 export default async function CategoryPage(props: PageProps) {
@@ -66,7 +72,7 @@ export default async function CategoryPage(props: PageProps) {
   await dbConnect();
 
   const entries = await WikiEntry.find({ category: typedCategory })
-    .select("title slug threatLevel")
+    .select("title slug threatLevel coverImage")
     .sort({ title: 1 })
     .lean<CategoryEntry[]>();
 
@@ -102,16 +108,36 @@ export default async function CategoryPage(props: PageProps) {
             </p>
           </div>
         ) : (
-          <ul className="divide-y divide-hunter-warm/20 dark:divide-slate-800 border border-hunter-warm/20 dark:border-slate-800 rounded-lg overflow-hidden bg-white/40 dark:bg-hunter-night/30">
+          <ul className="not-prose divide-y divide-hunter-warm/20 dark:divide-slate-800 border border-hunter-warm/20 dark:border-slate-800 rounded-lg overflow-hidden bg-white/40 dark:bg-hunter-night/30">
             {entries.map((entry) => (
               <li key={entry._id.toString()}>
                 <Link
                   href={`/wiki/${entry.slug}`}
-                  className="flex justify-between items-center gap-4 px-6 py-4 hover:bg-hunter-warm/10 dark:hover:bg-hunter-gold/5 transition-colors group"
+                  className="flex items-center gap-4 px-4 py-3 hover:bg-hunter-warm/10 dark:hover:bg-hunter-gold/5 transition-colors group"
                 >
-                  <span className="font-serif text-lg text-hunter-dark dark:text-hunter-parchment group-hover:text-hunter-warm dark:group-hover:text-hunter-gold">
+                  {/* Thumbnail — falls back to a placeholder icon block when
+                      the entry has no cover image yet. Fixed 64×64 keeps
+                      every row the same height. */}
+                  <div className="relative shrink-0 h-16 w-16 overflow-hidden rounded border border-hunter-warm/30 bg-black/5 dark:bg-black/30">
+                    {entry.coverImage?.url ? (
+                      <Image
+                        src={entry.coverImage.url}
+                        alt={entry.coverImage.altText || entry.title}
+                        fill
+                        sizes="64px"
+                        className="object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-300"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-hunter-warm/50">
+                        <FileImage className="h-6 w-6" />
+                      </div>
+                    )}
+                  </div>
+
+                  <span className="flex-1 font-serif text-lg text-hunter-dark dark:text-hunter-parchment group-hover:text-hunter-warm dark:group-hover:text-hunter-gold">
                     {entry.title}
                   </span>
+
                   <span className="text-[10px] font-mono uppercase tracking-widest text-red-700 dark:text-red-500 flex items-center gap-1 whitespace-nowrap">
                     <ShieldAlert className="h-3 w-3" />
                     {entry.threatLevel}

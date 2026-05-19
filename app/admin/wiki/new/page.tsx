@@ -9,6 +9,7 @@ import RichTextEditor from "@/components/ui/RichTextEditor";
 import CoverImageUploader, {
   type CoverImageValue,
 } from "@/components/ui/CoverImageUploader";
+import StatsEditor, { type StatRow } from "@/components/ui/StatsEditor";
 
 export default function NewWikiEntry() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function NewWikiEntry() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [weaknesses, setWeaknesses] = useState<string[]>([""]);
+  const [stats, setStats] = useState<StatRow[]>([]);
   const [coverImage, setCoverImage] = useState<CoverImageValue | null>(null);
 
   const addWeakness = () => setWeaknesses([...weaknesses, ""]);
@@ -36,6 +38,9 @@ export default function NewWikiEntry() {
       threatLevel: formData.get("threatLevel") || "Unknown",
       content: content, // HTML from your custom RichTextEditor
       weaknesses: weaknesses.filter((w) => w.trim() !== ""),
+      // Strip rows that are blank in either column — the API does this too
+      // but trimming on the client keeps the payload smaller.
+      stats: stats.filter((s) => s.label.trim() && s.value.trim()),
       // Fall back to the entity name if the user skipped alt text
       coverImage: coverImage
         ? {
@@ -177,6 +182,10 @@ export default function NewWikiEntry() {
               onChange={setCoverImage}
               label="Entity Photo (Optional)"
             />
+          </div>
+
+          <div className="bg-white/50 dark:bg-hunter-shadow p-6 rounded border border-slate-300 dark:border-slate-800">
+            <StatsEditor value={stats} onChange={setStats} />
           </div>
 
           <div className="space-y-2">
