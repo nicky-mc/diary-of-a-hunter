@@ -6,6 +6,7 @@
 
 "use client";
 
+import { useEffect, useState } from "react";
 import { type Editor } from "@tiptap/react";
 import { CldUploadWidget } from "next-cloudinary";
 import {
@@ -41,10 +42,50 @@ import {
   Heading3,
   Pilcrow,
 } from "lucide-react";
-import { FONT_OPTIONS } from "@/lib/fonts";
+import { FONT_OPTIONS, type FontOption } from "@/lib/fonts";
 
 interface ToolbarProps {
   editor: Editor;
+}
+
+// Shape of a font row returned by /api/fonts
+interface UploadedFont {
+  _id: string;
+  name: string;
+  family: string;
+}
+
+// Lightweight hook that fetches uploaded fonts once when the editor mounts.
+// Returns the same FontOption shape the static list uses so we can just
+// concat them together for the dropdown.
+function useCustomFontOptions(): FontOption[] {
+  const [options, setOptions] = useState<FontOption[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/fonts")
+      .then((r) => r.json())
+      .then((data: { fonts?: UploadedFont[] }) => {
+        if (cancelled || !data?.fonts) return;
+        setOptions(
+          data.fonts.map((f) => ({
+            label: f.name,
+            // Quote the family name in case it has spaces. The @font-face
+            // declaration uses the same un-quoted slug, but the CSS spec
+            // accepts both forms.
+            cssValue: `"${f.family}"`,
+          })),
+        );
+      })
+      .catch(() => {
+        // Silently fall back to the built-in fonts only.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return options;
 }
 
 // =============================================================================
@@ -103,6 +144,7 @@ const FONT_SIZES = [
 
 export default function Toolbar({ editor }: ToolbarProps) {
   const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+  const customFonts = useCustomFontOptions();
 
   // -------- Prompts (link / youtube) ----------------------------------------
 
@@ -256,6 +298,15 @@ export default function Toolbar({ editor }: ToolbarProps) {
             {f.label}
           </option>
         ))}
+        {customFonts.length > 0 && (
+          <optgroup label="Uploaded fonts">
+            {customFonts.map((f) => (
+              <option key={f.label} value={f.cssValue}>
+                {f.label}
+              </option>
+            ))}
+          </optgroup>
+        )}
       </select>
 
       <select

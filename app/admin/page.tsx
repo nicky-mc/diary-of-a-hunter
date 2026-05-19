@@ -96,6 +96,22 @@ export default async function AdminDashboard() {
               Access Files
             </Link>
           </section>
+
+          {/* Action Card: Fonts */}
+          <section className="group relative overflow-hidden rounded-xl border border-slate-300 dark:border-slate-800 bg-white/80 dark:bg-hunter-shadow p-6 shadow-lg transition-all hover:border-hunter-warm dark:hover:border-hunter-gold">
+            <h2 className="font-serif text-2xl font-bold mb-2">Fonts</h2>
+            <p className="text-sm mb-6 text-slate-600 dark:text-slate-400">
+              Upload custom typefaces. New fonts appear automatically in the
+              editor&apos;s font dropdown.
+            </p>
+            <Link
+              href="/admin/fonts"
+              className="inline-block bg-hunter-mid text-hunter-parchment px-4 py-2 rounded text-sm font-bold uppercase tracking-wider hover:bg-hunter-warm transition-colors focus-visible:ring-2 focus-visible:ring-hunter-warm outline-none"
+              aria-label="Manage uploaded fonts"
+            >
+              Manage Fonts
+            </Link>
+          </section>
         </div>
       </div>
     </div>
