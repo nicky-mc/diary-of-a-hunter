@@ -117,7 +117,6 @@ Recommend `.woff2` to the user — most font sites (Google Fonts, FontShare, etc
 2. **No font preview before upload** — the preview only renders after the font is installed. Adding a "drag to preview" step is doable but adds complexity.
 3. **Public read** — `/api/fonts` is public so the editor on the admin side and the public detail pages can both fetch the list. The actual font files on Cloudinary are also public (necessary — your readers' browsers need to download them). If you ever need locked-down fonts, that's a different setup.
 
-Pull `abbb624`, restart dev, and have a go. Drop a `.woff2` in at `/admin/fonts` and watch it appear in the editor instantly.
 
 ⚠️ Contribution Guidelines
 If you have encountered a new entity, survived an attack, or uncovered a piece of the conspiracy surrounding the Mother's Fire, submit a Pull Request.
