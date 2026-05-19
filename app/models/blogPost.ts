@@ -34,4 +34,19 @@ const BlogPostSchema = new Schema<IBlogPost>({
   },
 });
 
+// Compound text index — see wiki/wikiEntry.ts for the rationale and
+// production caveat about syncIndexes().
+BlogPostSchema.index(
+  {
+    title: "text",
+    tags: "text",
+    excerpt: "text",
+    content: "text",
+  },
+  {
+    name: "blog_search",
+    weights: { title: 10, tags: 5, excerpt: 3, content: 1 },
+  },
+);
+
 export default models.BlogPost || model<IBlogPost>("BlogPost", BlogPostSchema);

@@ -66,6 +66,26 @@ const WikiEntrySchema = new Schema<IWikiEntry>(
   { timestamps: true },
 );
 
+// Compound text index — MongoDB only permits one text index per collection,
+// so every field we want full-text-searchable lives here. Weights make
+// title matches outrank content matches in the search-score ranking.
+//
+// First-time collection setup: Mongoose calls `ensureIndexes` on connect,
+// which is fine for dev. In production, run `WikiEntry.syncIndexes()` once
+// after deploy or accept the slight first-query latency.
+WikiEntrySchema.index(
+  {
+    title: "text",
+    "stats.value": "text",
+    weaknesses: "text",
+    content: "text",
+  },
+  {
+    name: "wiki_search",
+    weights: { title: 10, "stats.value": 4, weaknesses: 3, content: 1 },
+  },
+);
+
 const WikiEntry =
   models.WikiEntry || mongoose.model<IWikiEntry>("WikiEntry", WikiEntrySchema);
 export default WikiEntry;
