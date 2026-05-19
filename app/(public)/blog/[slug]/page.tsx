@@ -2,7 +2,9 @@
 import dbConnect from "@/lib/mongodb";
 import BlogPost, { IBlogPost } from "@/app/models/blogPost";
 import { notFound } from "next/navigation";
-import { CldImage } from "next-cloudinary";
+// next/image rather than CldImage — see app/(public)/wiki/[slug]/page.tsx
+// for the explanation. CldImage breaks server-component boundaries here.
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { redirectLegacyIdToSlug } from "@/lib/legacySlugRedirect";
@@ -43,7 +45,7 @@ export default async function BlogPostPage(props: PageProps) {
       {/* HERO HEADER — fills the gap that -mt-20 below depends on */}
       <header className="relative h-[60vh] min-h-[420px] w-full overflow-hidden">
         {post.coverImage?.url ? (
-          <CldImage
+          <Image
             src={post.coverImage.url}
             alt={post.coverImage.altText || post.title}
             fill
