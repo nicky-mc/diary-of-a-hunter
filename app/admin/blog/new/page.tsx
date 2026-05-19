@@ -4,12 +4,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import RichTextEditor from "@/components/ui/RichTextEditor";
+import CoverImageUploader, {
+  type CoverImageValue,
+} from "@/components/ui/CoverImageUploader";
 
 export default function NewFieldReport() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [tags, setTags] = useState("");
   const [content, setContent] = useState("");
+  const [coverImage, setCoverImage] = useState<CoverImageValue | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -22,7 +26,19 @@ export default function NewFieldReport() {
       const response = await fetch("/api/blog", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, tags, content }),
+        // If the user uploaded an image but never typed alt text, fall back
+        // to the title so we never persist an empty alt string.
+        body: JSON.stringify({
+          title,
+          tags,
+          content,
+          coverImage: coverImage
+            ? {
+                url: coverImage.url,
+                altText: coverImage.altText || title,
+              }
+            : undefined,
+        }),
       });
 
       const data = (await response.json()) as {
@@ -50,10 +66,10 @@ export default function NewFieldReport() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4ECD8] dark:bg-[#0a0a0a] text-slate-900 dark:text-slate-200 p-6 md:p-12 transition-colors duration-300">
+    <div className="p-6 md:p-12">
       <div className="max-w-4xl mx-auto space-y-8">
-        <header className="border-b-2 border-[#8B5A2B] pb-4">
-          <h1 className="font-serif text-3xl font-bold uppercase tracking-widest text-[#5C3A21] dark:text-[#D4A373]">
+        <header className="border-b-2 border-hunter-warm pb-4">
+          <h1 className="font-serif text-3xl font-bold uppercase tracking-widest text-hunter-mid dark:text-hunter-gold">
             Draft Field Report
           </h1>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
@@ -84,7 +100,7 @@ export default function NewFieldReport() {
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full rounded border border-slate-300 bg-white/80 p-3 text-slate-900 focus:border-[#8B5A2B] focus:ring-1 focus:ring-[#8B5A2B] outline-none dark:border-slate-700 dark:bg-[#121212] dark:text-slate-100"
+              className="w-full rounded border border-slate-300 bg-white/80 p-3 text-slate-900 focus:border-hunter-warm focus:ring-1 focus:ring-hunter-warm outline-none dark:border-slate-700 dark:bg-hunter-shadow dark:text-slate-100"
               placeholder="e.g., Midnight Skirmish at the Docks"
             />
           </div>
@@ -101,10 +117,16 @@ export default function NewFieldReport() {
               type="text"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
-              className="w-full rounded border border-slate-300 bg-white/80 p-3 text-slate-900 focus:border-[#8B5A2B] focus:ring-1 focus:ring-[#8B5A2B] outline-none dark:border-slate-700 dark:bg-[#121212] dark:text-slate-100"
+              className="w-full rounded border border-slate-300 bg-white/80 p-3 text-slate-900 focus:border-hunter-warm focus:ring-1 focus:ring-hunter-warm outline-none dark:border-slate-700 dark:bg-hunter-shadow dark:text-slate-100"
               placeholder="e.g., ghoul, silver, close-call"
             />
           </div>
+
+          <CoverImageUploader
+            value={coverImage}
+            onChange={setCoverImage}
+            label="Cover Image (Optional)"
+          />
 
           <div className="space-y-2">
             <label className="text-sm font-semibold uppercase tracking-wider block">
@@ -120,7 +142,7 @@ export default function NewFieldReport() {
           <button
             type="submit"
             disabled={isSubmitting || !content || !title}
-            className="w-full rounded bg-[#5C3A21] px-4 py-3 font-bold uppercase tracking-widest text-[#F4ECD8] hover:bg-[#8B5A2B] disabled:opacity-50 transition-all active:scale-95"
+            className="w-full rounded bg-hunter-mid px-4 py-3 font-bold uppercase tracking-widest text-hunter-parchment hover:bg-hunter-warm disabled:opacity-50 transition-all active:scale-95"
           >
             {isSubmitting ? "Encrypting..." : "Publish Report"}
           </button>

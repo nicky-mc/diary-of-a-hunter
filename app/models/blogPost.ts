@@ -12,7 +12,8 @@ export interface IBlogPost {
   authorId: mongoose.Types.ObjectId | string;
   isPublished: boolean;
   publishedAt: Date;
-  coverImage: {
+  // Optional — a post can be filed before a cover image is uploaded
+  coverImage?: {
     url: string;
     altText: string;
   };

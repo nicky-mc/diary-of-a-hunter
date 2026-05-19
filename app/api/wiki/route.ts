@@ -13,6 +13,10 @@ interface CreateWikiBody {
   threatLevel?: string;
   weaknesses?: string | string[];
   content: string;
+  coverImage?: {
+    url: string;
+    altText: string;
+  };
 }
 
 // ----------------------------------------------------------------------
@@ -31,7 +35,8 @@ export async function POST(req: Request) {
     }
 
     const body = (await req.json()) as CreateWikiBody;
-    const { title, category, threatLevel, weaknesses, content } = body;
+    const { title, category, threatLevel, weaknesses, content, coverImage } =
+      body;
 
     if (!title || !category || !content) {
       return NextResponse.json(
@@ -64,6 +69,7 @@ export async function POST(req: Request) {
       threatLevel: threatLevel || "Unknown",
       weaknesses: parsedWeaknesses,
       content,
+      coverImage,
       authorId: session.user.id,
     });
 
