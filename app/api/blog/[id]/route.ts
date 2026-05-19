@@ -1,25 +1,25 @@
-// src/app/api/wiki/[id]/route.ts
+// src/app/api/blog/[id]/route.ts
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import dbConnect from "@/lib/mongodb";
-import WikiEntry from "@/app/models/wikiEntry";
+import BlogPost from "@/app/models/blogPost";
 import { MongoError } from "mongodb";
 
 // Strictly define the shape of the update body
-interface UpdateWikiBody {
+interface UpdateBlogBody {
   title?: string;
-  category?: string;
-  threatLevel?: string;
-  weaknesses?: string | string[];
   content?: string;
+  tags?: string | string[];
+  excerpt?: string;
   coverImage?: {
     url: string;
     altText: string;
   };
+  isPublished?: boolean;
 }
 
-// Next.js dynamic route params are now Promises in recent versions
+// Next.js dynamic route params are Promises in Next 16
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
@@ -33,18 +33,18 @@ export async function GET(req: Request, props: RouteContext) {
     const id = params.id;
 
     await dbConnect();
-    const entry = await WikiEntry.findById(id).lean();
+    const post = await BlogPost.findById(id).lean();
 
-    if (!entry) {
+    if (!post) {
       return NextResponse.json(
-        { error: "File not found. It may have been purged." },
+        { error: "Report not found. The signal may have been jammed." },
         { status: 404 },
       );
     }
 
-    return NextResponse.json({ success: true, entry }, { status: 200 });
+    return NextResponse.json({ success: true, post }, { status: 200 });
   } catch (error: unknown) {
-    console.error("Wiki GET Error:", error);
+    console.error("Blog GET Error:", error);
     return NextResponse.json(
       { error: "Failed to decrypt the file." },
       { status: 500 },
@@ -67,38 +67,40 @@ export async function PUT(req: Request, props: RouteContext) {
 
     const params = await props.params;
     const id = params.id;
-    const body = (await req.json()) as UpdateWikiBody;
+    const body = (await req.json()) as UpdateBlogBody;
 
     await dbConnect();
 
-    // Parse weaknesses safely
-    let parsedWeaknesses: string[] = [];
-    if (body.weaknesses) {
-      parsedWeaknesses =
-        typeof body.weaknesses === "string"
-          ? body.weaknesses
+    // Parse tags safely (same logic as POST)
+    let parsedTags: string[] | undefined;
+    if (body.tags !== undefined) {
+      parsedTags = Array.isArray(body.tags)
+        ? body.tags
+        : typeof body.tags === "string"
+          ? body.tags
               .split(",")
-              .map((w) => w.trim())
+              .map((t) => t.trim())
               .filter(Boolean)
-          : body.weaknesses;
+          : [];
     }
 
-    const updatedEntry = await WikiEntry.findByIdAndUpdate(
-      id,
-      {
-        ...body,
-        ...(body.weaknesses && { weaknesses: parsedWeaknesses }),
-        ...(body.title && {
-          slug: body.title
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/(^-|-$)+/g, ""),
-        }),
-      },
-      { new: true, runValidators: true },
-    );
+    const updates: Record<string, unknown> = { ...body };
+    if (parsedTags !== undefined) updates.tags = parsedTags;
 
-    if (!updatedEntry) {
+    // Regenerate slug if the title changed
+    if (body.title) {
+      updates.slug = body.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)+/g, "");
+    }
+
+    const updatedPost = await BlogPost.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedPost) {
       return NextResponse.json(
         { error: "Target not found. Update aborted." },
         { status: 404 },
@@ -106,10 +108,11 @@ export async function PUT(req: Request, props: RouteContext) {
     }
 
     return NextResponse.json(
-      { success: true, entry: updatedEntry },
+      { success: true, post: updatedPost },
       { status: 200 },
     );
   } catch (error: unknown) {
+    console.error("Blog PUT Error:", error);
     if (error instanceof Error && (error as MongoError).code === 11000) {
       return NextResponse.json(
         { error: "Title conflict. Designation already in use." },
@@ -140,9 +143,9 @@ export async function DELETE(req: Request, props: RouteContext) {
     const id = params.id;
 
     await dbConnect();
-    const deletedEntry = await WikiEntry.findByIdAndDelete(id);
+    const deletedPost = await BlogPost.findByIdAndDelete(id);
 
-    if (!deletedEntry) {
+    if (!deletedPost) {
       return NextResponse.json(
         { error: "Target already destroyed or missing." },
         { status: 404 },
@@ -150,10 +153,11 @@ export async function DELETE(req: Request, props: RouteContext) {
     }
 
     return NextResponse.json(
-      { success: true, message: "File permanently purged." },
+      { success: true, message: "Report permanently purged." },
       { status: 200 },
     );
   } catch (error: unknown) {
+    console.error("Blog DELETE Error:", error);
     return NextResponse.json(
       { error: "Purge failed. Intel is stuck." },
       { status: 500 },

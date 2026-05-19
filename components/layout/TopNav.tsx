@@ -17,26 +17,26 @@ export default function TopNav() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
 
-  // Prevent hydration mismatch
+  // Only the theme-toggle icon needs the mounted gate — useTheme can't be
+  // resolved on the server. Everything else renders SSR-safe so we don't
+  // get a layout shift while React hydrates.
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted) return null;
-
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#3A2214] bg-[#5C3A21] shadow-lg transition-colors duration-300 dark:bg-[#0a0a0a] dark:border-black">
+    <header className="sticky top-0 z-50 w-full border-b border-hunter-dark bg-hunter-mid shadow-lg dark:bg-hunter-void dark:border-black">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
         <div className="flex h-16 items-center justify-between">
           {/* Logo Section */}
           <div className="flex-shrink-0">
             <Link
               href="/"
-              className="flex items-center gap-2 text-lg sm:text-xl font-serif font-bold text-[#F4ECD8] hover:text-white transition-colors"
+              className="flex items-center gap-2 text-lg sm:text-xl font-serif font-bold text-hunter-parchment hover:text-white transition-colors"
             >
-              <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-[#D4A373]" />
+              <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-hunter-gold" />
               <span className="hidden sm:inline">Diary of a Hunter</span>
               <span className="sm:hidden">DOAH</span>
             </Link>
@@ -48,19 +48,19 @@ export default function TopNav() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-[#F4ECD8] hover:text-[#D4A373] px-3 py-2 rounded-md text-sm font-medium transition-all"
+                className="text-hunter-parchment hover:text-hunter-gold px-3 py-2 rounded-md text-sm font-medium transition-all"
               >
                 {link.name}
               </Link>
             ))}
 
-            <div className="h-4 w-px bg-[#F4ECD8]/20 mx-2" />
+            <div className="h-4 w-px bg-hunter-parchment/20 mx-2" />
 
             {/* Authenticated State vs Guest State */}
             {status === "authenticated" ? (
               <Link
                 href="/admin"
-                className="flex items-center gap-2 text-[#D4A373] bg-[#D4A373]/10 border border-[#D4A373]/30 px-3 py-1 rounded text-xs font-bold uppercase tracking-widest hover:bg-[#D4A373]/20 transition-all"
+                className="flex items-center gap-2 text-hunter-gold bg-hunter-gold/10 border border-hunter-gold/30 px-3 py-1 rounded text-xs font-bold uppercase tracking-widest hover:bg-hunter-gold/20 transition-all"
               >
                 <ShieldAlert className="h-4 w-4" />
                 Admin
@@ -70,7 +70,7 @@ export default function TopNav() {
             ) : (
               <Link
                 href="/login"
-                className="flex items-center gap-2 text-[#F4ECD8] hover:text-white text-xs font-bold uppercase tracking-widest"
+                className="flex items-center gap-2 text-hunter-parchment hover:text-white text-xs font-bold uppercase tracking-widest"
               >
                 <LogIn className="h-4 w-4" />
                 Login
@@ -82,19 +82,31 @@ export default function TopNav() {
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 rounded-full text-[#F4ECD8] hover:bg-[#3A2214]/50 transition-colors"
+              className="p-2 rounded-full text-hunter-parchment hover:bg-hunter-dark/50 transition-colors"
               aria-label="Toggle Night Vision"
+              // Disable until mounted — clicking before hydration would
+              // toggle to the wrong state because `theme` is undefined.
+              disabled={!mounted}
             >
-              {theme === "dark" ? (
-                <Sun className="h-5 w-5 text-[#D4A373]" />
+              {/* Reserve space with a neutral icon on the server so the layout
+                  doesn't shift once the actual theme is known on the client. */}
+              {mounted ? (
+                theme === "dark" ? (
+                  <Sun className="h-5 w-5 text-hunter-gold" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )
               ) : (
-                <Moon className="h-5 w-5" />
+                <Moon
+                  className="h-5 w-5 opacity-0"
+                  aria-hidden="true"
+                />
               )}
             </button>
 
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden p-2 rounded-md text-[#F4ECD8] hover:bg-[#3A2214]/50"
+              className="lg:hidden p-2 rounded-md text-hunter-parchment hover:bg-hunter-dark/50"
               aria-label="Open Archive Menu"
             >
               {isOpen ? (
@@ -115,14 +127,14 @@ export default function TopNav() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="lg:hidden fixed inset-0 top-16 z-40 bg-[#5C3A21] dark:bg-[#111] px-6 py-12 flex flex-col gap-8"
+            className="lg:hidden fixed inset-0 top-16 z-40 bg-hunter-mid dark:bg-[#111] px-6 py-12 flex flex-col gap-8"
           >
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
                 onClick={() => setIsOpen(false)}
-                className="text-3xl font-serif text-[#F4ECD8] border-b border-[#F4ECD8]/10 pb-4"
+                className="text-3xl font-serif text-hunter-parchment border-b border-hunter-parchment/10 pb-4"
               >
                 {link.name}
               </Link>
@@ -132,7 +144,7 @@ export default function TopNav() {
               <Link
                 href="/admin"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 text-2xl text-[#D4A373] font-bold uppercase"
+                className="flex items-center gap-3 text-2xl text-hunter-gold font-bold uppercase"
               >
                 <ShieldAlert className="h-8 w-8" />
                 Admin Dashboard
@@ -141,7 +153,7 @@ export default function TopNav() {
               <Link
                 href="/login"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 text-2xl text-[#F4ECD8] font-bold uppercase"
+                className="flex items-center gap-3 text-2xl text-hunter-parchment font-bold uppercase"
               >
                 <LogIn className="h-8 w-8" />
                 Login

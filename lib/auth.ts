@@ -14,14 +14,12 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        console.log("--- AUTH ATTEMPT ---");
-
         if (!credentials?.email || !credentials?.password) {
-          console.error("Auth Failed: Missing credentials input");
           return null;
         }
 
-        // 1. Dynamic Whitelist Parsing
+        // 1. Dynamic whitelist — only emails in AUTHORIZED_HUNTERS can attempt
+        //    auth even if their password is correct.
         const authorizedList = (process.env.AUTHORIZED_HUNTERS || "")
           .split(",")
           .map((email) => email.trim().toLowerCase())
@@ -29,40 +27,31 @@ export const authOptions: NextAuthOptions = {
 
         const emailLower = credentials.email.toLowerCase().trim();
 
-        // 2. Whitelist Check
+        // 2. Whitelist check (intentionally generic error message —
+        //    don't leak whether the email exists in the DB)
         if (!authorizedList.includes(emailLower)) {
-          console.error(`Access Denied: ${emailLower} is not whitelisted.`);
           throw new Error(
             "Access Denied: You are not authorized to access this terminal.",
           );
         }
 
-        // 3. Database Sync
+        // 3. Database lookup
         await dbConnect();
-
-        // 4. Find Hunter (Matches 'password' field in your new model)
         const user = await User.findOne({ email: emailLower });
 
         if (!user) {
-          console.error(
-            `Auth Failed: ${emailLower} whitelisted but not found in DB.`,
-          );
           throw new Error("No hunter found with this designation.");
         }
 
-        // 5. Password Verification (Bcrypt)
-        // Note: we use user.password here because we updated the model
+        // 4. Password verification
         const isPasswordCorrect = await bcrypt.compare(
           credentials.password,
           user.password,
         );
 
         if (!isPasswordCorrect) {
-          console.error(`Auth Failed: Incorrect password for ${emailLower}`);
           throw new Error("Invalid decryption key (Password).");
         }
-
-        console.log(`Auth Success: Welcome, ${user.name}`);
 
         return {
           id: user._id.toString(),

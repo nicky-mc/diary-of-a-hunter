@@ -9,14 +9,14 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-[#F4ECD8] dark:bg-[#121212] py-16 px-4 sm:px-6 lg:px-8 transition-colors duration-300 relative overflow-hidden">
+    <div className="min-h-screen bg-hunter-parchment dark:bg-hunter-shadow py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Gritty Noise Overlay - Simulates aged paper or a static-filled terminal */}
       <div className="pointer-events-none absolute inset-0 z-0 bg-[url('/noise.png')] opacity-10 dark:opacity-20 mix-blend-overlay"></div>
 
       <div className="relative z-10 max-w-5xl mx-auto flex flex-col md:flex-row gap-12 items-center md:items-start">
         {/* Visual Evidence Column */}
         <div className="w-full md:w-1/3 relative shrink-0 group">
-          <div className="relative aspect-[3/4] w-full rounded-md overflow-hidden border-4 border-[#5C3A21] dark:border-[#3A2214] shadow-2xl transform md:-rotate-2 transition-transform group-hover:rotate-0 duration-500">
+          <div className="relative aspect-[3/4] w-full rounded-md overflow-hidden border-4 border-hunter-mid dark:border-hunter-dark shadow-2xl transform md:-rotate-2 transition-transform group-hover:rotate-0 duration-500">
             {/* Cloudinary Image Integration.
               CRITICAL: Update the src with your actual Cloudinary path once uploaded.
             */}
@@ -29,9 +29,9 @@ export default function AboutPage() {
               priority
             />
             {/* Dark magical overlay effect */}
-            <div className="absolute inset-0 bg-[#8B5A2B] mix-blend-multiply opacity-20 dark:opacity-40 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-hunter-warm mix-blend-multiply opacity-20 dark:opacity-40 pointer-events-none"></div>
           </div>
-          <p className="mt-4 text-center font-['Caveat',_cursive] text-xl text-[#5C3A21] dark:text-[#D4A373] -rotate-2">
+          <p className="mt-4 text-center font-caveat text-xl text-hunter-mid dark:text-hunter-gold -rotate-2">
             Exhibit A: The Ashes
           </p>
         </div>
@@ -39,26 +39,26 @@ export default function AboutPage() {
         {/* Manifesto Content Column */}
         <div className="w-full md:w-2/3">
           <header className="mb-8">
-            <h1 className="font-serif text-5xl md:text-6xl font-bold text-[#3A2214] dark:text-[#F4ECD8] tracking-tight mb-2 border-b-2 border-[#8B5A2B] pb-4">
+            <h1 className="font-serif text-5xl md:text-6xl font-bold text-hunter-dark dark:text-hunter-parchment tracking-tight mb-2 border-b-2 border-hunter-warm pb-4">
               The Truth Burns. <br />
-              <span className="text-[#8B5A2B] dark:text-[#D4A373]">
+              <span className="text-hunter-warm dark:text-hunter-gold">
                 So Do I.
               </span>
             </h1>
 
-            <h2 className="font-['Caveat',_cursive] text-3xl text-[#5C3A21] dark:text-[#D4A373] mt-4 font-normal tracking-wider">
+            <h2 className="font-caveat text-3xl text-hunter-mid dark:text-hunter-gold mt-4 font-normal tracking-wider">
               My name is Amber Thessaily. Welcome to the frontline.
             </h2>
           </header>
 
-          <article className="space-y-6 text-[#1A1A1A] dark:text-slate-300 leading-relaxed text-lg font-sans">
+          <article className="space-y-6 text-hunter-night dark:text-slate-300 leading-relaxed text-lg font-sans">
             <p>
               Most people walk through life half-asleep. They think the
               scratching at the window is a stray cat. They think the shadow in
               the alley is just a trick of the light. They’re wrong.
             </p>
             <p>
-              <strong className="text-[#5C3A21] dark:text-[#F4ECD8] font-bold">
+              <strong className="text-hunter-mid dark:text-hunter-parchment font-bold">
                 Monsters are real.
               </strong>{" "}
               And right now, they’re preparing for a war that humanity doesn`&apos;t
@@ -73,7 +73,7 @@ export default function AboutPage() {
               war.
             </p>
 
-            <blockquote className="border-l-4 border-[#8B5A2B] pl-6 italic my-8 text-xl font-serif text-[#3A2214] dark:text-[#D4A373] bg-black/5 dark:bg-white/5 p-4 rounded-r-lg shadow-sm">
+            <blockquote className="border-l-4 border-hunter-warm pl-6 italic my-8 text-xl font-serif text-hunter-dark dark:text-hunter-gold bg-black/5 dark:bg-white/5 p-4 rounded-r-lg shadow-sm">
               &quot;Since that night, I&apos;ve made it my life’s work to drag
               the truth out of the shadows.&quot;
             </blockquote>
