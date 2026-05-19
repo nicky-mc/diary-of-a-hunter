@@ -12,6 +12,12 @@
 // The persisted HTML is plain semantic markup — works in `prose` containers
 // on the public detail pages with no extra renderer needed.
 
+// The NodeView uses useState/useRef/useEffect — required even though this
+// file is imported via the client RichTextEditor, because Next 16 sometimes
+// loses the boundary propagation if a server component happens to import
+// any module in this chain transitively (e.g. Tiptap's HTML serialiser).
+"use client";
+
 import { Node, mergeAttributes } from "@tiptap/core";
 import {
   NodeViewWrapper,
